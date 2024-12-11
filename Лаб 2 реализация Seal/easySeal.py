@@ -64,11 +64,10 @@ if __name__ == "__main__":
 
     # Расшифровываем текст
     decrypted_text = seal.decrypt(ciphertext)
-    print("Расшифрованный текст (в байтах):", decrypted_text)
+    print("Расшифрованный текст", decrypted_text)
 
     # Проверяем, что расшифрованный текст совпадает с исходным
     if decrypted_text == plaintext:
         print("Расшифровка успешна.")
-        print("Расшифрованный текст (в строковом формате):", decrypted_text.decode("utf-8"))
     else:
         print("Ошибка: Расшифрованный текст не совпадает с исходным!")
