@@ -17,7 +17,9 @@ img.save("original_qr.png")
 # Имитируем повреждение изображения
 img = Image.open("original_qr.png")
 pixels = img.load()
-for i in range(150, 170):  # Удаляем часть данных
-    for j in range(150, 170):
-        pixels[i, j] = (255)
+
+# Удаляем часть данных
+for i in range(150, 250):
+    for j in range(150, 250):
+        pixels[i, j] = 255
 img.save("damaged_qr.png")
