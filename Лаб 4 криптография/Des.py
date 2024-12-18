@@ -2,10 +2,11 @@ from textwrap import wrap
 import operator
 from functools import reduce
 
-KEY = '133457799BBCDFF1'  # hexadecimal 8-bit key
+# Ключ шифрования в шестнадцатеричном формате
+KEY = '133457799BBCDFF1'
 
+# Таблицы перестановок
 INITIAL_PERMUTATION = [
-
     57, 49, 41, 33, 25, 17, 9, 1,
     59, 51, 43, 35, 27, 19, 11, 3,
     61, 53, 45, 37, 29, 21, 13, 5,
@@ -14,11 +15,10 @@ INITIAL_PERMUTATION = [
     58, 50, 42, 34, 26, 18, 10, 2,
     60, 52, 44, 36, 28, 20, 12, 4,
     62, 54, 46, 38, 30, 22, 14, 6
-
 ]
 
+# Обратная перестановка
 INVERSE_PERMUTATION = [
-
     39, 7, 47, 15, 55, 23, 63, 31,
     38, 6, 46, 14, 54, 22, 62, 30,
     37, 5, 45, 13, 53, 21, 61, 29,
@@ -27,11 +27,10 @@ INVERSE_PERMUTATION = [
     34, 2, 42, 10, 50, 18, 58, 26,
     33, 1, 41, 9, 49, 17, 57, 25,
     32, 0, 40, 8, 48, 16, 56, 24,
-
 ]
 
+# Подстановочные таблицы Sub-Box
 SUB_BOX = [
-
     [
         14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,
         0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
@@ -80,11 +79,10 @@ SUB_BOX = [
         7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8,
         2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
     ]
-
 ]
 
+# Таблица расширения
 EXPANSION = [
-
     31, 0, 1, 2, 3, 4,
     3, 4, 5, 6, 7, 8,
     7, 8, 9, 10, 11, 12,
@@ -93,19 +91,17 @@ EXPANSION = [
     19, 20, 21, 22, 23, 24,
     23, 24, 25, 26, 27, 28,
     27, 28, 29, 30, 31, 0
-
 ]
-PERMUTATION = [
 
+# Таблица перестановки
+PERMUTATION = [
     15, 6, 19, 20, 28, 11, 27, 16,
     0, 14, 22, 25, 4, 17, 30, 9,
     1, 7, 23, 13, 31, 26, 2, 8,
     18, 12, 29, 5, 21, 10, 3, 24
-
 ]
-
+# Первая выборка ключа
 PERMUTED_CHOICE_1 = [
-
     56, 48, 40, 32, 24, 16, 8,
     0, 57, 49, 41, 33, 25, 17,
     9, 1, 58, 50, 42, 34, 26,
@@ -114,11 +110,10 @@ PERMUTED_CHOICE_1 = [
     6, 61, 53, 45, 37, 29, 21,
     13, 5, 60, 52, 44, 36, 28,
     20, 12, 4, 27, 19, 11, 3
-
 ]
 
+# Вторая выборка ключа
 PERMUTED_CHOICE_2 = [
-
     13, 16, 10, 23, 0, 4,
     2, 27, 14, 5, 20, 9,
     22, 18, 11, 3, 25, 7,
@@ -127,57 +122,57 @@ PERMUTED_CHOICE_2 = [
     29, 39, 50, 44, 32, 47,
     43, 48, 38, 55, 33, 52,
     45, 41, 49, 35, 28, 31
-
 ]
 
+# Количество сдвигов для генерации ключей
 ROTATES = [
-
     1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
-
 ]
 
 
+# Конвертирует сообщение из ASCII в шестнадцатеричную строку
 def slice_mess(string):
-    """converts mess from ascii to hex string"""
     return [i.zfill(16) for i in wrap(''.join([hex(ord(i))[2:] for i in string]), 16)]
 
 
+# Конвертирует строку в двоичный формат с заполнением нулями до четырех бит
 def to_bin(s):
-    """converts str to 4-bit slices and fill it zeros if needed"""
     return ''.join([bin(int(i, 16))[2:].zfill(4) for i in s])
 
 
+# Переставляет последовательность в соответствии с таблицами перестановок
 def permute(block, box):
-    """permutes sequence according to permutation tables"""
     return ''.join([block[i] for i in box])
 
 
+# Выполняет операцию XOR между двумя двоичными строками
 def XOR(arg_1, arg_2):
     return ''.join([str(int(i) ^ int(j)) for i, j in zip(arg_1, arg_2)])
 
 
+# Сдвигает блок влево на заданное количество бит
 def rotate_left(block, i):
-    """makes C-rotate, coz Py-rotate little not what needed"""
     return bin(int(block, 2) << i & 0x0fffffff | int(block, 2) >> 28 - i)[2:].zfill(28)
 
 
+# Объединяет список строк в одну строку
 def concatenate(args):
     return reduce(operator.iadd, args, [])
 
 
+# Генерирует ключи для каждого круга
 def key_gen(block_1, block_2):
     li = []
     for i in ROTATES:
         block_1 = rotate_left(block_1, i)
         block_2 = rotate_left(block_2, i)
         li.append(permute(block_1 + block_2, PERMUTED_CHOICE_2))
-
     return li
 
 
+# Функция F для обработки правой половины блока
 def f(block, key):
     final = []
-
     for j, i in enumerate(wrap(XOR(permute(block, EXPANSION), key), 6)):
         temp_box = [
             SUB_BOX[j][0:16],
@@ -185,13 +180,12 @@ def f(block, key):
             SUB_BOX[j][32:48],
             SUB_BOX[j][48:64]
         ]
-        # print(temp_box)
         final.append(bin(temp_box[int(i[0] + i[-1], 2)]
                          [int(i[1:-1], 2)])[2:].zfill(4))
-
     return permute(''.join(final), PERMUTATION)
 
 
+# Основная функция DES для обработки блока данных с использованием ключей."""
 def des(block, key_array):
     left, right = block[0: len(block) // 2], block[len(block) // 2:]
     for j, i in zip(range(1, 17), key_array):
@@ -201,41 +195,34 @@ def des(block, key_array):
 
 def main(mess, mod):
     if mod == 0:
+        # Шифрование
         encrypted_list = []
         for i in slice_mess(mess):
             bin_mess, bin_key = to_bin(i), to_bin(KEY)
-
             permuted_key, permuted_block = permute(
                 bin_key, PERMUTED_CHOICE_1), permute(bin_mess, INITIAL_PERMUTATION)
-
             key_list = key_gen(
                 permuted_key[: len(permuted_key) // 2], permuted_key[len(permuted_key) // 2:])
-
             encrypted_list.append(''.join([hex(int(i, 2))[2:].zfill(
                 2).upper() for i in des(permuted_block, key_list)]))
-
         print(''.join(encrypted_list))
 
     elif mod == 1:
+        # Дешифрование
         temp_li = []
         final = []
         for i in wrap(mess, 16):
             bin_mess, bin_key = to_bin(i), to_bin(KEY)
-
             permuted_key, permuted_block = permute(
                 bin_key, PERMUTED_CHOICE_1), permute(bin_mess, INITIAL_PERMUTATION)
-
             key_list = key_gen(
                 permuted_key[: len(permuted_key) // 2], permuted_key[len(permuted_key) // 2:])
-
             temp_li.append(''.join([hex(int(i, 2))[2:].zfill(2).upper()
                                     for i in des(permuted_block, reversed(key_list))]))
-
         print(''.join(concatenate(
             [[chr(int(j, 16)) for j in wrap(i, 2) if int(j, 16) != 0] for i in temp_li])))
 
 
 if __name__ == '__main__':
     while True:
-        main(input('Input sentence: '), int(
-            input('Choose mod (0 - encrypt, 1 - decrypt): ')))
+        main(input('Введите текст: '), int(input('Закодировать текст - 0\nДекодировать текст - 1: ')))
